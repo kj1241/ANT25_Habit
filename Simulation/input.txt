@@ -1,0 +1,23 @@
+TotalIterations 2500
+TotalAgents 1000
+
+Location A 600
+Location B 600
+Location C 600
+Location D 600
+
+Link S1 MainRoad 3 27 0.7 5 B A
+Link S2 MainRoad 3 27 0.7 5 C B
+Link S3 MainRoad 3 27 0.7 5 D C
+Link S4 Highway 2.5 40 0.4 6 B A
+Link S5 Highway 2.5 40 0.4 6 C B
+Link S6 Railway 3.5 33 0.4 1 B A
+
+Agent B A 8.0 true
+Agent C A 8.0 true
+Agent D A 8.0 true
+
+LinkUpdate 1000 S6 3.5 50 0.2 1 B A true
+LinkUpdate 1500 S7 3.5 33 0.4 1 C A false
+
+AgentUpdate 1000 0 0 true
