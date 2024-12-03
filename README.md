@@ -26,10 +26,16 @@ ANT25_Habit/
 │   ├── main.cpp
 │   ├── input.txt
 ├── Example/
-│   ├── no-habit/
-│       ├── agent_utility.csv/
-│   ├── habit(1)/
-│       ├── agent_utility.csv/
+│   ├── NoneSample/
+│       ├── no-habit/
+│           ├── agent_utility.zip/
+│       ├── habit(1)/
+│           ├── agent_utility.zip/
+│   ├── SOCSample/
+│       ├── (Soc1)habit/
+│           ├── agent_utility.zip/
+│       ├── (Soc1)no-habit/
+│           ├── agent_utility.zip/
 ├── Release/
 │   ├── Simulation/
 │       ├── Simulation.zip/
@@ -69,13 +75,30 @@ ANT25_Habit/
 - Visualizes trends in:
 - Evaluates the overall impact of infrastructure investments through intuitive charts and graphs.
 
-
-
-
 ## Example Results
+Simulation Output Data
+- Format: CSV
 
+Generated Visualizations
+- Example Chart
+   - Average Utility Score Over Iterations
+     ![image](https://github.com/user-attachments/assets/ba28eab6-9bf5-4f39-8bbc-c95b354c384b)
+   - Agent Count For Zone Over Iteration
+     ![image](https://github.com/user-attachments/assets/75b86c61-2a7b-482a-b169-b8b44ce2de42)
+   - Average Travel Time For Each Path Over Iterations
+     ![image](https://github.com/user-attachments/assets/10f82d71-af34-4c03-b8f7-200f65c002bf)
+   - Average Travel Time For Zone Over Iterations
+     ![image](https://github.com/user-attachments/assets/6c8a487a-ee39-4af1-b43c-d4c118d6523c)
+   - Average Selected Location Frequency Over Iterations
+     ![image](https://github.com/user-attachments/assets/0c338f19-3d15-4e37-9710-601e66a8050b)
+   - Average Mode Share Over Iterations
+     ![image](https://github.com/user-attachments/assets/a9bd2d1f-9177-4e26-a685-e008a5381e22)
+   - Average Habit Utility Over Iterations
+     ![image](https://github.com/user-attachments/assets/abc6bd35-b53b-457b-b5b4-87bc4e2cb988)
+   - Route Distribution Over Iterations
+     ![image](https://github.com/user-attachments/assets/d823ed7d-1ddf-4f61-8ffa-eb8a3096dba5)
+   - Number_of_Agents_with_Habit_Utility
+     ![image](https://github.com/user-attachments/assets/3972e987-e9eb-4d97-9f06-77bc33ea9adb)
 
 ## License
 This project is licensed under the MIT License. You are free to use, modify, and distribute this project under the terms of the license.
-
-
