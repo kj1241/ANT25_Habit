@@ -18,11 +18,30 @@ Key Contributions:
 
 ## Repository Structure
 ```
-
+ANT25_Habit/
+├── MakeChart/
+│   ├── MakeChart.ipynb
+│   ├── ComparisonChart.ipynb
+├── Simulation/
+│   ├── main.cpp
+│   ├── input.txt
+├── Example/
+│   ├── no-habit/
+│       ├── agent_utility.csv/
+│   ├── habit(1)/
+│       ├── agent_utility.csv/
+├── Release/
+│   ├── Simulation/
+│       ├── Simulation.zip/
+│   ├── MakeChart/
+│       ├── MakeChart.zip/
+├── LICENSE
+├── README.md
 ```
-- Python_Graph/: Python scripts for visualizing traffic patterns and analyzing agent behaviors.
-- Cpp_Simulation/: C++ program for simulating agent-based travel behavior on road and rail networks.
-- data/: Contains input datasets and sample output results for testing.
+- **MakeChart**: Python scripts for visualizing traffic patterns and analyzing agent behaviors.
+- **Simulation**: C++ program for simulating agent-based travel behavior on road and rail networks.
+- **Release**: Packaged distributions of the simulation and charting tools for easy deployment.
+- **Example**: Contains example outputs and datasets for testing.
 
 ## Installation
 
