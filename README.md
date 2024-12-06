@@ -1,5 +1,5 @@
-# Paper Title: **Adding habit effects on scoring function in agent based transport simulation**
-**Authors:** Chansung Kima, Kyoungju Kimb, Jiyoung Park  
+# Paper Title: **Incorporating the habit effect on scoring function in agent based transport simulation**
+**Authors:** Chansung Kim, Kyoungju Kim, Jiyoung Park  
 **Publication:** <!--[Conference/Journal Name], [Year]-->  
 **DOI:** <!--[DOI Link or "TBA"]-->  
 **GitHub Repository:** [ANT25_Habit](https://github.com/kj1241/ANT25_Habit)  
@@ -9,7 +9,7 @@ This repository contains the implementation of a C++ agent-based simulation and 
 
 Key Contributions:
 1. C++ Agent-Based Simulation: 
-   - Models individual travel behaviors, including departure time, route selection, and habitual preferences.
+   - Models individual travel behaviors, including location, mode, departure time, route, and habitual preferences.
    - Simulates road and rail network expansions to analyze their effects on congestion and travel patterns.
    - Provides outputs for agent-level travel data, including utility scores and route choices.
 2. Python Analysis Tool:
@@ -65,7 +65,7 @@ ANT25_Habit/
 ## Features
 ### C++ Agent-Based Simulation
 - Models dynamic agent behavior with:
-  - Departure points, routes, timing, and habitual preferences.
+  - o	Location, departure points, routes, travel time, and habitual preferences.
 - Supports scenario analysis:
   - Road network expansions: Evaluates the impact of new or widened roads.
   - Rail network expansions: Measures the effectiveness of rail infrastructure improvements.
