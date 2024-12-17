@@ -204,15 +204,15 @@ private:
 // 에이전트 클래스
 class Agent {
 public:
-    Agent(Location* h, Location* w, std::vector<std::vector<Link*>> routes, std::vector<Location*> origins, double pat, double start, std::mt19937& g, bool habit_flag)
+    Agent(Location* h, Location* w, std::vector<std::vector<Link*>> routes, std::vector<Location*> origins, double pat, double start, std::mt19937& g, double beta_k)
         : home(h), work(w), possible_routes(routes), possible_origins(origins), PAT(pat * 60),
-        start_time(start * 60), prev_start_time(start * 60), beta_r(-0.27), beta_t(-0.06), beta_j(-0.05),
+        start_time(start * 60), prev_start_time(start * 60), beta_r(-0.27), beta_t(-0.06), beta_j(-0.05), beta_k(beta_k),
         zeta(0.9), gamma(20.0), delta(5.0), lambda(4.0), vtts(1.0), prev_utility(0.0), gen(g), rand_dist(0.0, 1.0),
         travel_time(0.0), arrival_time(0.0), SDE(0), SDL(0), travel_time_utility(0),
-        punctuality_utility(0), location_utility(0), total_utility(0), habit_utility(0), habit(0),
+        punctuality_utility(0), location_utility(0), total_utility(0), habit_utility(0), habit(0), isChangeHabit(false),
         previous_travel_times(0.0)
     {
-        beta_k = habit_flag ? 0.2 : 0.0; // beta_k 설정
+
         random_utility_factor = rand_dist(gen) * 0.2;
 
         // 초기 경로를 랜덤하게 선택
@@ -331,6 +331,16 @@ public:
         beta_k = k;
     }
 
+    bool get_isChangeHabit()
+    {
+        return isChangeHabit;
+    }
+
+    void set_isChangeHabit(bool result)
+    {
+        isChangeHabit = result;
+    }
+
     double get_prev_utility()
     {
         return prev_utility;
@@ -341,7 +351,8 @@ public:
         return possible_routes;
     }
 
-    void calc_agent_utility()
+
+    void calc_agent_utility(int mode)
     {
         // 유틸리티 계산
         double travel_time_hours = travel_time; // 60.0;
@@ -357,7 +368,14 @@ public:
         double occupancy_rate = static_cast<double>(home->get_current_agents()) / home->get_capactiy();
         location_utility = std::exp(lambda * occupancy_rate) * beta_j;
 
-        habit_utility = std::clamp(beta_k * habit, 0.0, beta_k * 5);
+        if (mode == 1 || mode == 2)
+        {
+            habit_utility = std::clamp(beta_k * habit, 0.0, beta_k * 5);
+        }
+        else if (mode == 3)
+            habit_utility = std::clamp(beta_k * habit, beta_k * 5, 0.0);
+        else
+            habit_utility = 0;        
 
         total_utility = travel_time_utility + punctuality_utility + location_utility + habit_utility;
 
@@ -414,6 +432,7 @@ private:
     std::uniform_real_distribution<> rand_dist;
 
     int habit;
+    bool isChangeHabit;
 
     double travel_time;
     double arrival_time; // 도착 시간
@@ -547,9 +566,9 @@ void simulate_agent_movements(std::vector<Agent>& agents, std::vector<Link*>& al
 }
 
 // 유틸리티 계산 함수
-void calculate_agent_utilities(std::vector<Agent>& agents) {
+void calculate_agent_utilities(std::vector<Agent>& agents,int mode) {
     for (auto& agent : agents) {
-        agent.calc_agent_utility();
+        agent.calc_agent_utility(mode);
     }
 }
 
@@ -568,14 +587,16 @@ void reassign_agents(
     std::uniform_int_distribution<>& location_dist,
     std::unordered_map<std::string, std::vector<std::pair<std::string, Link*>>>& graph,
     std::vector<Location*>& origins, // origins 벡터를 전달
-    std::vector<Link*>& all_links
+    std::vector<Link*>& all_links,
+    int mode
 ) {
     // 1. 에이전트를 총 유틸리티를 기준으로 정렬합니다.
     std::vector<std::pair<double, int>> agent_utilities;
     for (size_t i = 0; i < agents.size(); ++i) {
         agent_utilities.push_back({ agents[i].get_prev_utility(), static_cast<int>(i) });
         // 재배정하기 전에 모든 에이전트는 습관을 증가시킵니다.
-        agents[i].add_habit();
+        //agents[i].add_habit();
+        agents[i].set_isChangeHabit(false);
     }
 
     std::sort(agent_utilities.begin(), agent_utilities.end());
@@ -629,18 +650,61 @@ void reassign_agents(
 
         // 경로를 랜덤하게 선택합니다.
         std::uniform_int_distribution<> route_dist(0, possible_routes.size() - 1);
-        if (agent.get_current_route() != possible_routes[route_dist(gen)]) 
-{
+        if (agent.get_current_route() != possible_routes[route_dist(gen)])
+        {
             agent.set_current_route(possible_routes[route_dist(gen)]);
-            if (agent.get_habit() > 5)
-                agent.set_habit(4);
-            else if (agent.get_habit() > 1)
-                agent.down_upate_habit(2);
-            else
-                agent.set_habit(0);
-        }
+            /*      if (agent.get_habit() > 5)
+                      agent.set_habit(4);
+                  else if (agent.get_habit() > 1)
+                      agent.down_upate_habit(2);
+                  else
+                      agent.set_habit(0);*/
 
+            agent.set_isChangeHabit(true);
+        }
         agent.set_start_time(start_time_dist(gen) * 60);
+    }
+
+    //후처리 개인적 유틸리티 같은거 후처리하기 위해서 있는 곳
+    for (size_t i = 0; i < agents.size(); ++i)
+    {
+        if (mode == 1)
+        {
+            if (agents[i].get_isChangeHabit())
+            {
+                if(agents[i].get_habit() <= 5&& agents[i].get_habit() > 0)
+                    agents[i].down_upate_habit(1);
+            }
+            else
+            {
+                if (agents[i].get_habit() < 5 && agents[i].get_habit() >= 0)
+                    agents[i].add_habit();
+            }
+        }
+        else if (mode == 2)
+        {
+            if (agents[i].get_isChangeHabit())
+            {
+                    agents[i].set_habit(0);
+            }
+            else
+            {
+                if (agents[i].get_habit() < 5 && agents[i].get_habit() >= 0)
+                    agents[i].add_habit();
+            }
+        }
+        else if (mode == 3)
+        {
+            if (agents[i].get_isChangeHabit())
+            {
+                if (agents[i].get_habit() < 5 && agents[i].get_habit() >= 0)
+                    agents[i].add_habit();
+            }
+            else
+            {
+                agents[i].set_habit(0);
+            }
+        }
     }
 }
 
@@ -661,6 +725,7 @@ int main() {
     struct LinkUpdateInfo {
         int iteration;
         std::string link_name;
+        std::string link_type;
         double free_flow_time;
         double congestion_factor;
         int capacity;
@@ -681,6 +746,15 @@ int main() {
     };
     std::vector<AgentUpdateInfo> agent_updates;
 
+    struct AgentAddInfo {
+        int iteration;
+        int count;
+        std::string home;
+        std::string work;
+        bool is_active;
+    };
+    std::vector<AgentAddInfo> agent_adds;
+
     // 총 반복 횟수를 저장할 변수
     int TOTAL_ITERATIONS = 2500; // 기본값
     int TOTAL_AGENTS = 1000; // 기본값
@@ -695,7 +769,9 @@ int main() {
     std::string line;
     // 총 반복 횟수 및 에이전트 수 읽기
     while (std::getline(infile, line)) {
-        if (line.empty()) {
+        if (line[0] == '#')
+            continue;
+        if (line.empty() ) {
             // 빈 줄이면 다음 섹션으로 이동
             break;
         }
@@ -712,6 +788,8 @@ int main() {
 
     // Location 읽기
     while (std::getline(infile, line)) {
+        if (line[0] == '#')
+            continue;
         if (line.empty()) {
             // 빈 줄이면 다음 섹션으로 이동
             break;
@@ -731,6 +809,8 @@ int main() {
 
     // Link 읽기
     while (std::getline(infile, line)) {
+        if (line[0] == '#')
+            continue;
         if (line.empty()) {
             // 빈 줄이면 다음 섹션으로 이동
             break;
@@ -761,11 +841,12 @@ int main() {
         std::string home_name;
         std::string work_name;
         double PAT;
-        bool habit_flag;
     };
     std::vector<AgentInfo> agent_types;
 
     while (std::getline(infile, line)) {
+        if (line[0] == '#')
+            continue;
         if (line.empty()) {
             // 빈 줄이면 다음 섹션으로 이동
             break;
@@ -774,16 +855,43 @@ int main() {
         std::string type;
         iss >> type;
         if (type == "Agent") {
-            std::string home_name, work_name, habit_flag_str;
+            std::string home_name, work_name;
             double PAT;
-            iss >> home_name >> work_name >> PAT >> habit_flag_str;
-            bool habit_flag = (habit_flag_str == "true");
-            agent_types.push_back({ home_name, work_name, PAT, habit_flag });
+            iss >> home_name >> work_name >> PAT;
+            agent_types.push_back({ home_name, work_name, PAT });
+        }
+    }
+
+    //모드 업데이트
+    int mode;
+    double habit_parameter;
+    while (std::getline(infile, line)) {
+        if (line[0] == '#')
+            continue;
+        if (line.empty()) {
+            // 빈 줄이면 다음 섹션으로 이동
+            break;
+        }
+        std::istringstream iss(line);
+        std::string type;
+        iss >> type;
+        if (type == "Mode") {
+            iss >> mode >> habit_parameter;
+            if (mode == 1)
+                habit_parameter = abs(habit_parameter);
+            else if (mode == 2)
+                habit_parameter = abs(habit_parameter);
+            else if (mode == 3)
+                habit_parameter = -abs(habit_parameter);
+            else
+                habit_parameter = 0.0;
         }
     }
 
     // 링크 업데이트 정보 읽기
     while (std::getline(infile, line)) {
+        if (line[0] == '#')
+            continue;
         if (line.empty()) {
             // 빈 줄이면 종료
             break;
@@ -793,21 +901,23 @@ int main() {
         iss >> type;
         if (type == "LinkUpdate") {
             int iteration;
-            std::string link_name, active_str;
+            std::string link_name, link_type, active_str;
             double free_flow_time, congestion_factor, exponent;
             int capacity;
             std::string from_node, to_node;
             bool is_active;
-            iss >> iteration >> link_name >> free_flow_time >> capacity >> congestion_factor >> exponent >> from_node >> to_node >> active_str;
+            iss >> iteration >> link_name >> link_type >>free_flow_time >> capacity >> congestion_factor >> exponent >> from_node >> to_node >> active_str;
             is_active = (active_str == "true");
             // 기존 링크인지 확인
             bool is_new_link = (links.find(link_name) == links.end());
-            link_updates.push_back({ iteration, link_name, free_flow_time, congestion_factor, capacity, exponent, from_node, to_node, is_active, is_new_link });
+            link_updates.push_back({ iteration, link_name,link_type, free_flow_time, congestion_factor, capacity, exponent, from_node, to_node, is_active, is_new_link });
         }
     }
 
     // 에이전트 업데이트 정보 읽기
     while (std::getline(infile, line)) {
+        if (line[0] == '#')
+            continue;
         if (line.empty()) {
             // 빈 줄이면 종료
             break;
@@ -826,6 +936,26 @@ int main() {
         }
     }
 
+    // 링크 업데이트 정보 읽기
+    while (std::getline(infile, line)) {
+        if (line[0] == '#')
+            continue;
+        if (line.empty()) {
+            // 빈 줄이면 종료
+            break;
+        }
+        std::istringstream iss(line);
+        std::string type;
+        iss >> type;
+        if (type == "AgentAdd") {
+            // AgentAdd 1000 400 D A 와 같은 형식
+            int iteration, count;
+            std::string home, work, active_str;
+            iss >> iteration >> count >> home >> work>> active_str;
+            bool is_active = (active_str == "true");
+            agent_adds.push_back({ iteration, count, home, work,is_active });
+        }
+    }
 
     infile.close();
 
@@ -869,7 +999,7 @@ int main() {
                 home->remove_agent();
                 continue;
             }
-            agents.emplace_back(home, work, possible_routes, origins, agent_info.PAT, random_start_time, gen, agent_info.habit_flag);
+            agents.emplace_back(home, work, possible_routes, origins, agent_info.PAT, random_start_time, gen, habit_parameter);
         }
     }
 
@@ -880,6 +1010,37 @@ int main() {
     std::uniform_int_distribution<> location_dist(1, locations.size());
 
     for (int iter = 0; iter < TOTAL_ITERATIONS; ++iter) {
+
+        // AgentAdd 적용 부분
+        for (const auto& agent_add : agent_adds) {
+            if (agent_add.iteration == iter && agent_add.is_active) {
+                Location* home = locations[agent_add.home];
+                Location* work = locations[agent_add.work];
+                if (home && work && home->get_name() != "A") {
+                    for (int i = 0; i < agent_add.count; ++i) {
+                        if (home->has_capacity()) {
+                            double random_start_time = start_time_dist(gen);
+                            home->add_agent();
+                            std::vector<std::vector<Link*>> possible_routes;
+                            std::vector<Link*> current_route;
+                            std::unordered_set<std::string> visited;
+                            int max_depth = 10;
+                            // 여기서는 PAT를 8.0으로 고정 (필요시 수정 가능)
+                            double PAT = 8.0;
+                            find_all_routes(home->get_name(), work->get_name(), graph, current_route, possible_routes, visited, max_depth);
+                            if (possible_routes.empty()) {
+                                home->remove_agent();
+                                continue;
+                            }
+                            agents.emplace_back(home, work, possible_routes, origins, PAT, random_start_time, gen, habit_parameter);
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
         // 특정 반복에서 에이전트 업데이트 처리
         for (const auto& agent_update : agent_updates) {
@@ -897,7 +1058,7 @@ int main() {
             if (update.iteration == iter && update.is_active) {
                 if (update.is_new_link) {
                     // 새로운 링크 추가
-                    Link* new_link = new Link(update.link_name, "Dynamic", update.free_flow_time, update.capacity, update.congestion_factor, update.exponent);
+                    Link* new_link = new Link(update.link_name, update.link_type, update.free_flow_time, update.capacity, update.congestion_factor, update.exponent);
                     links[update.link_name] = new_link;
                     all_links.push_back(new_link);
                     // 그래프에 추가
@@ -936,7 +1097,7 @@ int main() {
         simulate_agent_movements(agents, all_links);
 
         // 유틸리티 계산 단계
-        calculate_agent_utilities(agents);
+        calculate_agent_utilities(agents,mode);
 
         // CSV 기록 단계
         log_agent_utilities(agents, agent_utility_file, iter);
@@ -951,7 +1112,7 @@ int main() {
         std::cout << "Iteration " << iter << " - Total Utility: " << total_utility << std::endl;
 
         // 에이전트 재배정 단계
-        reassign_agents(agents, gen, start_time_dist, location_dist, graph, origins, all_links);
+        reassign_agents(agents, gen, start_time_dist, location_dist, graph, origins, all_links, mode);
     }
 
     agent_utility_file.close();
@@ -966,5 +1127,3 @@ int main() {
 
     return 0;
 }
-
-

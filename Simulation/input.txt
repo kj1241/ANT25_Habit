@@ -1,11 +1,15 @@
+#The total simulation iterations required to create SUE.
 TotalIterations 2500
+#The total number of agents set in the simulation.
 TotalAgents 1000
 
+#Graph Node Configuration of the Simulation (Location, Name, Capacity)
 Location A 600
 Location B 600
 Location C 600
 Location D 600
 
+#Link Configuration of the Simulation (Link, Name, Type, Free Flow Time, Capacity, Alpha, Beta, Origin, Destination) [Type determines the mode of transportation]
 Link S1 MainRoad 3 27 0.7 5 B A
 Link S2 MainRoad 3 27 0.7 5 C B
 Link S3 MainRoad 3 27 0.7 5 D C
@@ -13,11 +17,21 @@ Link S4 Highway 2.5 40 0.4 6 B A
 Link S5 Highway 2.5 40 0.4 6 C B
 Link S6 Railway 3.5 33 0.4 1 B A
 
-Agent B A 8.0 true
-Agent C A 8.0 true
-Agent D A 8.0 true
+#Agent Configuration of the Simulation (Agent, Origin, Destination, Punctuality)
+Agent B A 8.0 
+Agent C A 8.0 
+Agent D A 8.0 
 
-LinkUpdate 1000 S6 3.5 50 0.2 1 B A true
-LinkUpdate 1500 S7 3.5 33 0.4 1 C A false
+#Simulation Hobby Application Mode (Mode, Index, Hobby Coefficient) [0 = No Hobby Applied, 1 = Increase (+), Decrease (-), 2 = Increase (+), Decrease Fixed at 0, 3 = Increase Fixed at 0, Decrease (-)]
+Mode 1 0.2
 
+#Infrastructure Investment During the Convergence Process
+#Link Update Due to Infrastructure Investment (Link Update, Iteration Point, Name, Type, Free Flow Time, Capacity, Alpha, Beta, Origin, Destination, Application Status)
+LinkUpdate 1000 S6 Railway 3.5 50 0.2 1 B A true
+LinkUpdate 1000 S7 Railway 3.5 33 0.8 1 C A false
+
+#Change in Individual Utility During Iterative Process (Agent Update, Iteration Point, Hobby Status, Hobby Parameter, Application Status)
 AgentUpdate 1000 0 0 true
+
+#Population Change (Agent Add, Iteration Point, Increase in Population, Home, Workplace, Application Status)
+AgentAdd 1000 400 D A false
