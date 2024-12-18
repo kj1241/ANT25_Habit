@@ -5,7 +5,7 @@
 **GitHub Repository:** [ANT25_Habit](https://github.com/kj1241/ANT25_Habit)  
 
 ## Overview
-This repository contains the implementation of a C++ agent-based simulation and a Python-based analysis tool used in the study "Adding habit effects on scoring function in agent based transport simulation". The study evaluates the impact of SOC (Social Overhead Capital) investments, such as road and rail network expansions, on individual travel behaviors and overall traffic system efficiency.
+This repository contains the implementation of a C++ agent-based simulation and a Python-based analysis tool used in the study "Adding habit effects on scoring function in agent-based transport simulation". The study evaluates the impact of infrastructure investments, such as road and rail network expansions, on individual travel behaviors and overall traffic system efficiency.
 
 Key Contributions:
 1. C++ Agent-Based Simulation: 
@@ -22,25 +22,34 @@ ANT25_Habit/
 ├── MakeChart/
 │   ├── MakeChart.ipynb
 │   ├── ComparisonChart.ipynb
+│   ├── PipInstall.ipynb
 ├── Simulation/
 │   ├── main.cpp
 │   ├── input.txt
 ├── Example/
-│   ├── NoneSample/
+│   ├── None_Sample/
 │       ├── no-habit/
 │           ├── agent_utility.zip/
 │       ├── habit(1)/
 │           ├── agent_utility.zip/
-│   ├── SOCSample/
-│       ├── (Soc1)habit/
+│       ├── Comparison/
+│   ├── Infrastructure_Sample/
+│       ├── (Infrastructure1)no-habit/
 │           ├── agent_utility.zip/
-│       ├── (Soc1)no-habit/
+│       ├── (Infrastructure1)habit/
 │           ├── agent_utility.zip/
+│       ├── (Infrastructure1)Comparison/
+│   ├── Habit_Mode_Comparison/
+│       ├── mode1/
+│           ├── agent_utility.zip/
+│       ├── mode2/
+│           ├── agent_utility.zip/
+│       ├── mode3/
+│           ├── agent_utility.zip/
+│       ├── Comparison/
 ├── Release/
 │   ├── Simulation/
 │       ├── Simulation.zip/
-│   ├── MakeChart/
-│       ├── MakeChart.zip/
 ├── LICENSE
 ├── README.md
 ```
@@ -48,8 +57,23 @@ ANT25_Habit/
 - **Simulation**: C++ program for simulating agent-based travel behavior on road and rail networks.
 - **Release**: Packaged distributions of the simulation and charting tools for easy deployment.
 - **Example**: Contains example outputs and datasets for testing.
+   - **None_Sample**: Compares the general state with the habit-affected state in a basic scenario.
+   - **Infrastructure_Sample**: Compares the general state with the habit-affected state in an infrastructure investment scenario (e.g., road expansion, rail network improvements, population growth).
+   - **Habit_Mode_Comparison**: Compares different methods of applying habits across states.
+      - **mode1**: Positive feedback (habit effect increases travel utility when the mode of transport remains unchanged, and decreases when changed).
+      - **mode2**: Positive feedback (habit effect increases travel utility when the mode of transport remains unchanged, and remains neutral when changed).
+      - **mode3**: Negative feedback (habit effect decreases travel utility when the mode of transport changes, and remains neutral when unchanged).
 
 ## Installation
+The system was tested on Windows 10 for compatibility.
+
+1. Python Setup:
+   - To set up the Python environment, simply run the PipInstall.ipynb notebook.
+   - This will automatically install all required Python dependencies for analysis and chart generation.
+
+2. Simulation Setup:
+   - To run the C++ agent-based simulation, ensure that you have Visual Studio Redistributable Packages installed on your system.
+   - Once the redistributable packages are installed, you can compile and run the simulation directly from the source code using Visual Studio.
 
 
 ## Usage
