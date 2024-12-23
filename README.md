@@ -59,6 +59,9 @@ ANT25_Habit/
 - **Example**: Contains example outputs and datasets for testing.
    - **None_Sample**: Compares the general state with the habit-affected state in a basic scenario.
    - **Infrastructure_Sample**: Compares the general state with the habit-affected state in an infrastructure investment scenario (e.g., road expansion, rail network improvements, population growth).
+      - **Infrastructure1**: Results of comparing habit and no-habit scenarios due to changes in the S6 capacity parameter from infrastructure investments at iteration 1000.
+      - **Infrastructure2**: Results of comparing habit and no-habit scenarios due to the construction of S7 rail from infrastructure investments at iteration 1000.
+      - **Infrastructure3**: Results of comparing habit and no-habit scenarios due to population growth to 1400 from infrastructure investments at iteration 1000.
    - **Habit_Mode_Comparison**: Compares different methods of applying habits across states.
       - **mode1**: Positive feedback (habit effect increases travel utility when the mode of transport remains unchanged, and decreases when changed).
       - **mode2**: Positive feedback (habit effect increases travel utility when the mode of transport remains unchanged, and remains neutral when changed).
